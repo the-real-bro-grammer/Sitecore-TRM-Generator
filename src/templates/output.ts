@@ -27,21 +27,25 @@ function GenerateTemplate(
     return `
     import { ImageField, LinkField, TextField, RichTextField } from "@sitecore-jss/sitecore-jss-nextjs";
     import {
-    CheckboxField,
-    ContentItem,
-    FieldMetadata,
-    IContentItem,
-    LookupField,
-    MultilistField,
-    NameValueListField,
-    RawItem,
-    TemplateFactory
-} from 'sitecore-trm';
+        CheckboxField,
+        ContentItem,
+        FieldMetadata,
+        IContentItem,
+        LookupField,
+        MultilistField,
+        NameValueListField,
+        NumberField,
+        RawItem,
+        TemplateFactory,
+    } from 'sitecore-trm';
 
     type TemplateType = new (item: RawItem) => IContentItem;
     
     ${interfaces.join('\n')}
     ${classes.join('\n')}    
-    ${templateRegistrations.join('\n')}
+    
+    export function RegisterTemplates() {
+        ${templateRegistrations.join('\n')}
+    }
     `;
 }
