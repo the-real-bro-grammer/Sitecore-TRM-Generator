@@ -1,19 +1,19 @@
 import { IntrospectionField, IntrospectionOutputTypeRef } from 'graphql';
-import { getFieldName, getIdFromDescription, getNameFromDescription } from '../lib';
+import { getFieldName } from '../lib';
 import { reservedFieldNames } from '../lib/util/reserved-field-names';
+import { GenerateFieldsProps } from '../types/templates/generate-fields-props';
 
-export function GenerateFieldsFromIntrospection(
-    fields: readonly IntrospectionField[],
-    asClass: boolean = false
-): string {
-    const output = fields.map((field) => GenerateFieldFromIntrospection(field, asClass));
+export function generateFields(props: GenerateFieldsProps): string {
+    const output = props.fields.map((field) =>
+        GenerateFieldFromIntrospection(field, props.withAccessModifier)
+    );
 
     return output.join('');
 }
 
 function GenerateFieldFromIntrospection(
     field: IntrospectionField,
-    asClass: boolean
+    withAccessModifier: boolean
 ): string | void {
     const fieldName = getFieldName(field.name);
 
@@ -22,18 +22,11 @@ function GenerateFieldFromIntrospection(
     }
 
     const type = GenerateFieldType(field.type);
-    if (asClass) {
-        return `${GenerateFieldMeta(field)}
-        public ${fieldName}: ${type};`;
+    if (withAccessModifier) {
+        return `public ${fieldName}: ${type};`;
     }
 
     return `${fieldName}: ${type};`;
-}
-
-function GenerateFieldMeta(field: IntrospectionField): string {
-    return `@FieldMetadata('${getNameFromDescription(field.description)}', '${getIdFromDescription(
-        field.description
-    )}', '${field.description}')`;
 }
 
 function GenerateFieldType(type: IntrospectionOutputTypeRef): string {

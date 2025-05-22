@@ -1,9 +1,17 @@
-import { IntrospectionObjectType } from 'graphql';
 import { getInterfaceName } from '../lib/util/generation-helpers';
-import { GenerateFieldsFromIntrospection } from './fields';
+import { GenerateInterfaceProps } from '../types/templates/generate-interface-props';
+import { generateTemplateDetails } from './template-details';
 
-export function generateInterface(object: IntrospectionObjectType): string {
-    return `export interface ${getInterfaceName(object.name)} extends IContentItem {
-    ${GenerateFieldsFromIntrospection(object.fields)}
+export function generateInterface(props: GenerateInterfaceProps): string {
+    return `${generateTemplateDetails(props.object)}
+    export interface ${getInterfaceName(props.name)} extends IContentItem {
+    ${
+        props.config.generateFields &&
+        props.config.generateFields({
+            config: props.config,
+            fields: props.object.fields,
+            withAccessModifier: false
+        })
+    }
     }`;
 }

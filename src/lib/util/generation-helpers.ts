@@ -1,13 +1,19 @@
 export function getInterfaceName(name: string): string {
-    return `I_${sanitizeName(name)}Item`;
+    return `I_${name}Item`;
 }
 
 export function getClassName(name: string): string {
-    return `${sanitizeName(name)}Item`;
+    return `${name}Item`;
 }
 
 export function getFieldName(name: string): string {
     return sanitizeName(name);
+}
+
+export function getPathFromDescription(description: string): string {
+    const pattern = /^(\/sitecore\/templates\/.*?)(?:\s+template\b)/;
+    const match = description.match(pattern);
+    return match ? match[1] : null;
 }
 
 export function getIdFromDescription(description: string): string {
@@ -23,7 +29,7 @@ export function getNameFromDescription(description: string): string {
     return match ? match[1].trim() : null;
 }
 
-function sanitizeName(name: string): string {
+export function sanitizeName(name: string): string {
     // Remove known prefixes
     name = name.replace(/^C___|^C__/, '');
 

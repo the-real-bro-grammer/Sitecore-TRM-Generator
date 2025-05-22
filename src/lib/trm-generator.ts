@@ -2,10 +2,16 @@ import fs from 'fs';
 import { IntrospectionObjectType, IntrospectionSchema } from 'graphql';
 import { GenerateModelsFromIntrospection } from '../templates';
 import { Config } from '../types';
+import { defaultConfig } from './default-config';
 
-export function generateModels(config: Config) {
+export function generateModels(configOverride: Config) {
+    const config: Config = {
+        ...defaultConfig,
+        ...configOverride
+    };
+
     const schema = getIntrospectionSchema(config.introspectionPath);
-    const output = generateModelClasses(schema, config.includePaths);
+    const output = generateModelClasses(schema, config);
 
     fs.writeFile(config.outputPath, output, (err) => {
         if (err) {
@@ -39,15 +45,15 @@ function getIntrospectionSchema(introspectionPath: string): IntrospectionSchema 
     return introspectionResult.__schema;
 }
 
-function generateModelClasses(schema: IntrospectionSchema, paths: string[]): string {
+function generateModelClasses(schema: IntrospectionSchema, config: Config): string {
     const types = schema.types.filter(
         (type: any) =>
             type.kind === 'OBJECT' &&
             type.description &&
-            paths.some((path) => type.description.includes(path))
+            config.includePaths.some((path) => type.description.includes(path))
     );
 
-    const template = GenerateModelsFromIntrospection(types as IntrospectionObjectType[]);
+    const template = GenerateModelsFromIntrospection(types as IntrospectionObjectType[], config);
 
     return template;
 }
